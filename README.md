@@ -22,3 +22,5 @@ A **real-time chat application** built using **React.js** and **WebSockets (Sock
 - Persistent message history
 
 output
+
+![Image](https://github.com/user-attachments/assets/2818a5fa-2e55-4504-b0a8-99ddc9db0c5a)
