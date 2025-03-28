@@ -1,29 +1,37 @@
-const express = require("express");
-const http = require("http");
-const { Server } = require("socket.io");
-const cors = require("cors");
+const express = require('express');
+const http = require('http');
+const { Server } = require('socket.io');
+const cors = require('cors');
 
 const app = express();
 const server = http.createServer(app);
-
 const io = new Server(server, {
-    cors: {
-        origin: "*",  // Allows requests from any frontend
-    },
+  cors: {
+    origin: '*',
+    methods: ['GET', 'POST']
+  }
 });
 
-io.on("connection", (socket) => {
-    console.log("A user connected");
+app.use(cors());
 
-    socket.on("message", (msg) => {
-        io.emit("message", msg); // Broadcasts message to all clients
-    });
+// Handle socket connections
+io.on('connection', (socket) => {
+  console.log('New user connected');
 
-    socket.on("disconnect", () => {
-        console.log("User disconnected");
-    });
+  socket.on('sendMessage', (message) => {
+    io.emit('receiveMessage', message);
+  });
+
+  socket.on('disconnect', () => {
+    console.log('User disconnected');
+  });
 });
 
-server.listen(3001, () => {
-    console.log("Server running on port 3001");
+// API Test Route
+app.get('/', (req, res) => {
+  res.send('Chat backend is running');
+});
+
+server.listen(5000, () => {
+  console.log('Server is running on http://localhost:5000');
 });
