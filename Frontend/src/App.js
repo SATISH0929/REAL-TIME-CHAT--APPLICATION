@@ -1,48 +1,39 @@
-import React, { useState, useEffect } from "react";
-import io from "socket.io-client";
-import "./App.css";
+import React, { useEffect, useState } from 'react';
+import io from 'socket.io-client';
+import BASE_URL from './config';
+import './styles.css';
 
-const socket = io("real-time-chat-application-ochre.vercel.app"); // Ensure correct WebSocket URL
+const socket = io(BASE_URL);
 
 const App = () => {
+  const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState("");
 
   useEffect(() => {
-    // Listen for new messages
-    const handleMessage = (msg) => {
+    socket.on('receiveMessage', (msg) => {
       setMessages((prevMessages) => [...prevMessages, msg]);
-    };
-
-    socket.on("message", handleMessage);
-
-    // Cleanup function to remove the event listener
-    return () => {
-      socket.off("message", handleMessage);
-    };
-  }, []); // Empty dependency array ensures it runs only once
+    });
+  }, []);
 
   const sendMessage = () => {
-    if (input.trim() !== "") {
-      socket.emit("message", input);
-      setInput("");
+    if (message.trim()) {
+      socket.emit('sendMessage', message);
+      setMessage('');
     }
   };
 
   return (
-    <div className="chat-container">
-      <h2>Chat App</h2>
-      <div className="messages">
+    <div className="container">
+      <h1>Chat App</h1>
+      <div className="chat-box">
         {messages.map((msg, index) => (
-          <div key={index} className={`message sent`}>
-            {msg}
-          </div>
+          <div key={index} className="message">{msg}</div>
         ))}
       </div>
       <input
         type="text"
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
         placeholder="Type a message..."
       />
       <button onClick={sendMessage}>Send</button>
